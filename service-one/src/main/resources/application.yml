@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: service.one
+
+  kafka:
+    bootstrap-servers: 172.20.10.3:29092,172.20.10.3:29093,172.20.10.3:29094
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        "[spring.json.trusted.packages]": '*'
+    consumer:
+      auto-offset-reset: earliest
+server:
+  port: 5002
