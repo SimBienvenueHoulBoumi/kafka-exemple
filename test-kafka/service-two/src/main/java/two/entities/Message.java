@@ -7,10 +7,12 @@ import jakarta.persistence.Id;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Builder;
 
 @Data
 @NoArgsConstructor
 @Entity
+@Builder
 public class Message {
 
     public Message(String title, String content) {
