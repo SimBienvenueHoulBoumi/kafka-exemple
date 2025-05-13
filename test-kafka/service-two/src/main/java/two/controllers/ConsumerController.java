@@ -8,17 +8,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
 import two.entities.Message;
-import two.kafka.KafkaConsumerService;
+import two.utils.MessageStore;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/consumer")
 public class ConsumerController {
 
-    private final KafkaConsumerService kafkaConsumerService;
+    private final MessageStore messageStore;
 
     @GetMapping
     public List<Message> getMessages() {
-        return kafkaConsumerService.getReceivedMessages();
+        return messageStore.getReceivedMessages();
     }
 }

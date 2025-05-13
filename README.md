@@ -24,3 +24,27 @@ http://localhost:5003/swagger-ui/index.html#/consumer-controller/
     Observer les échanges (via logs ou une interface type Kafka UI).
 
 NB : mon service kafka tourne dans un conteneur docker
+
+src/main/java/com/monapp/serviceorder/
+├── adapter/
+│   ├── controller/              # HTTP & REST adapters (@RestController)
+│   ├── event/                   # Kafka consumers (@KafkaListener)
+│   └── publisher/               # Kafka producers
+│
+├── application/                
+│   ├── port/in/                 # UseCases exposés (interfaces)
+│   │   └── CreateOrderUseCase.java
+│   └── port/out/                # Interfaces vers l’extérieur
+│       └── OrderEventPublisherPort.java
+│
+├── domain/
+│   ├── model/                   # Entités métier pures (DDD)
+│   │   └── Order.java
+│   └── service/                 # Règles métier (OrderValidator, etc.)
+│
+├── infrastructure/
+│   ├── persistence/             # impl. repository (JPA, Mongo, etc.)
+│   ├── messaging/               # impl. event publisher/consumer
+│   └── config/                  # Spring/Kafka config
+│
+└── serviceorderApplication.java
