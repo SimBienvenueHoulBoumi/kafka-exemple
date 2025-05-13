@@ -1,12 +1,12 @@
 🧪 Commandes utiles
 
-# ▶️ Lancer chaque l'application
+## ▶️ Lancer chaque l'application
 ./mvnw spring-boot:run 
 
-# 🔄 Rebuild complet du projet (clean + install des dépendances)
+## 🔄 Rebuild complet du projet (clean + install des dépendances)
 ./mvnw clean install
 
-# 🔁 Résoudre uniquement les dépendances, sans reconstruire le projet
+## 🔁 Résoudre uniquement les dépendances, sans reconstruire le projet
 ./mvnw dependency:resolve
 
 http://localhost:5002/swagger-ui/index.html#/producer-controller/
@@ -23,8 +23,9 @@ http://localhost:5003/swagger-ui/index.html#/consumer-controller/
 
     Observer les échanges (via logs ou une interface type Kafka UI).
 
-NB : mon service kafka tourne dans un conteneur docker
+NB : Je ne l'utilise pas ici mais voici l'arborescence ideale pour des microservices
 
+```bash
 src/main/java/com/monapp/serviceorder/
 ├── adapter/
 │   ├── controller/              # HTTP & REST adapters (@RestController)
@@ -48,3 +49,5 @@ src/main/java/com/monapp/serviceorder/
 │   └── config/                  # Spring/Kafka config
 │
 └── serviceorderApplication.java
+
+```
