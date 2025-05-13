@@ -1,145 +1,50 @@
+🧪 Commandes utiles
 
----
+# ▶️ Lancer chaque l'application
+./mvnw spring-boot:run 
 
-## 🏗️ Étape 1 — Créer le projet `shared-lib`
+# 🔄 Rebuild complet du projet (clean + install des dépendances)
+./mvnw clean install
 
-Tu peux appeler ça `shared-lib`, `common-utils`, ou `monapp-shared` — à toi l’inspiration.
+# 🔁 Résoudre uniquement les dépendances, sans reconstruire le projet
+./mvnw dependency:resolve
 
-```bash
-mkdir shared-lib
-cd shared-lib
+http://localhost:5002/swagger-ui/index.html#/producer-controller/
 
-mvn archetype:generate \
-  -DgroupId=com.monapp.shared \
-  -DartifactId=shared-lib \
-  -DarchetypeArtifactId=maven-archetype-quickstart \
-  -DinteractiveMode=false
-```
+http://localhost:5003/swagger-ui/index.html#/consumer-controller/
 
-🎁 Cela te génère une lib Java de base.
+⚙️ Procédure d'exécution
 
----
+    Lancer Kafka via Docker (avec le nombre de brokers souhaité).
 
-## 🧬 Étape 2 — Préparer le `pom.xml`
+    Configurer le fichier application.yml pour qu’il pointe vers l'adresse correcte de ton broker Kafka.
 
-On modifie le `pom.xml` pour dire : "Je suis une lib à publier sur Nexus".
+    Démarrer le service producer et le service consumer, dans l’ordre que tu veux (Kafka gère la persistance des messages).
 
-### `pom.xml` minimal :
+    Observer les échanges (via logs ou une interface type Kafka UI).
 
-```xml
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-         http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+NB : mon service kafka tourne dans un conteneur docker
 
-    <groupId>com.monapp.shared</groupId>
-    <artifactId>shared-lib</artifactId>
-    <version>1.0.0</version>
-    <packaging>jar</packaging>
-
-    <name>shared-lib</name>
-
-    <distributionManagement>
-        <repository>
-            <id>nexus-local</id>
-            <url>http://127.0.0.1:8081/repository/maven-releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>nexus-local</id>
-            <url>http://127.0.0.1:8081/repository/maven-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
-</project>
-```
-
----
-
-## 🔐 Étape 3 — Ajouter les credentials dans `~/.m2/settings.xml`
-
-Crée (ou modifie) le fichier `~/.m2/settings.xml` :
-
-```xml
-<settings>
-  <servers>
-    <server>
-      <id>nexus-local</id>
-      <username>admin</username>
-      <password>TON_MOT_DE_PASSE</password>
-    </server>
-  </servers>
-</settings>
-```
-
-🧠 Tu peux choper le mot de passe d’origine de Nexus ici :
-
-```
-/nexus-data/admin.password
-```
-
----
-
-## 🚀 Étape 4 — Publier dans Nexus
-
-Compile et installe :
-
-```bash
-mvn clean install
-```
-
-Puis déploie :
-
-```bash
-mvn deploy
-```
-
-Si tout est bon, tu verras le JAR apparaître dans ton Nexus sur cette URL :
-
-```
-http://127.0.0.1:8081/#browse/browse:maven-releases
-```
-
----
-
-## 🧩 Étape 5 — Utiliser la shared-lib dans un microservice
-
-Dans le `pom.xml` de ton microservice :
-
-```xml
-<dependencies>
-  <dependency>
-    <groupId>com.monapp.shared</groupId>
-    <artifactId>shared-lib</artifactId>
-    <version>1.0.0</version>
-  </dependency>
-</dependencies>
-
-<repositories>
-  <repository>
-    <id>nexus-local</id>
-    <url>http://127.0.0.1:8081/repository/maven-releases/</url>
-  </repository>
-</repositories>
-```
-## ajoute cette configuration dans ~/.m2/settings.xml
-
-```xml
-<settings>
-  <servers>
-    <server>
-      <id>nexus-local</id>
-      <username>admin</username>
-      <password>21d8186c-ccc7-4449-8875-f18a11af08be</password>
-    </server>
-  </servers>
-</settings>
-```
-
-
-
----
-
-
-# copy nexus pass
-docker exec -it nexus bash
-cat /nexus-data/admin.password
+src/main/java/com/monapp/serviceorder/
+├── adapter/
+│   ├── controller/              # HTTP & REST adapters (@RestController)
+│   ├── event/                   # Kafka consumers (@KafkaListener)
+│   └── publisher/               # Kafka producers
+│
+├── application/                
+│   ├── port/in/                 # UseCases exposés (interfaces)
+│   │   └── CreateOrderUseCase.java
+│   └── port/out/                # Interfaces vers l’extérieur
+│       └── OrderEventPublisherPort.java
+│
+├── domain/
+│   ├── model/                   # Entités métier pures (DDD)
+│   │   └── Order.java
+│   └── service/                 # Règles métier (OrderValidator, etc.)
+│
+├── infrastructure/
+│   ├── persistence/             # impl. repository (JPA, Mongo, etc.)
+│   ├── messaging/               # impl. event publisher/consumer
+│   └── config/                  # Spring/Kafka config
+│
+└── serviceorderApplication.java
